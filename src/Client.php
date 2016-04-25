@@ -99,9 +99,10 @@ class Client
 		'secrets'                => 'Repositories\SecretRepository',
 		'events'                 => 'Repositories\EventRepository',
 		'configMaps'             => 'Repositories\ConfigMapRepository',
-		
+
 		// extensions/v1beta1
 		'deployments'            => 'Repositories\DeploymentRepository',
+		'ingresses'              => 'Repositories\IngressRepository',
 		'jobs'                   => 'Repositories\JobRepository',
 	];
 
@@ -128,6 +129,8 @@ class Client
 	 * Set the options.
 	 *
 	 * @param array $options
+	 *
+	 * @throws MissingOptionException
 	 */
 	public function setOptions(array $options)
 	{
@@ -199,13 +202,15 @@ class Client
 	/**
 	 * Send a request.
 	 *
-	 * @param  string  $method
-	 * @param  string  $uri
-	 * @param  mixed   $query
-	 * @param  mixed   $body
-	 * @param  boolean $namespace
-	 * @param  string  $apiVersion
-	 * @return array
+	 * @param      $method
+	 * @param      $uri
+	 * @param null $query
+	 * @param null $body
+	 * @param bool $namespace
+	 * @param null $apiVersion
+	 *
+	 * @return string
+	 * @throws BadRequestException
 	 */
 	public function sendRequest($method, $uri, $query = null, $body = null, $namespace = true, $apiVersion = null)
 	{
@@ -249,6 +254,12 @@ class Client
 		return $this->sendRequest($method, $uri, $query, $body, $namespace, $this->betaApiVersion);
 	}
 
+	/**
+	 * @param $name
+	 * @param $args
+	 *
+	 * @return mixed
+	 */
 	public function __call($name, $args)
 	{
 		if (isset($this->classMap[$name])) {
